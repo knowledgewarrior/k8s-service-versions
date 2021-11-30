@@ -1,0 +1,13 @@
+{
+  "name": "versions-cluster-info",
+  "version": "1.0.0",
+  "description": "Retrieves image tags from k8s cluster and posts to MongoDB",
+  "author": "Jason Fowler",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-stage-manager": "^1.0.5"
+  },
+  "dependencies": {
+    "serverless-python-requirements": "^5.1.0"
+  }
+}

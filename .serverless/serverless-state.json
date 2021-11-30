@@ -1,0 +1,613 @@
+{
+  "service": {
+    "service": "versions-cluster-info",
+    "serviceObject": {
+      "name": "versions-cluster-info"
+    },
+    "provider": {
+      "stage": "staging",
+      "variableSyntax": "\\${([^{}]+?)}",
+      "name": "aws",
+      "runtime": "python3.8",
+      "iamManagedPolicies": [
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      ],
+      "region": "us-west-2",
+      "environment": {
+        "DYNAMODB_TABLE": "versions-cluster-info-staging"
+      },
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem"
+          ],
+          "Resource": "arn:aws:dynamodb:us-west-2:*:table/versions-cluster-info-staging"
+        }
+      ],
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "StagingDashgetimagesLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/versions-cluster-info-staging-staging-getimages"
+            }
+          },
+          "IntegrationsDashgetimagesLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/versions-cluster-info-staging-integrations-getimages"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "versions-cluster-info",
+                        "staging",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/versions-cluster-info-staging*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/versions-cluster-info-staging*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "versions-cluster-info",
+                    "staging",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              },
+              "ManagedPolicyArns": [
+                "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            }
+          },
+          "StagingDashgetimagesLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/versions-cluster-info/staging/1600106191180-2020-09-14T17:56:31.180Z/versions-cluster-info.zip"
+              },
+              "FunctionName": "versions-cluster-info-staging-staging-getimages",
+              "Handler": "get-images-post-db.main",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "python3.8",
+              "Timeout": 10,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "versions-cluster-info-staging",
+                  "MONGO_DB_USER": "versions",
+                  "MONGO_DB_PASS": "TP8jfyb217sKhyZa",
+                  "MONGO_DB_NAME": "versions",
+                  "MONGO_DB_URL": "devtest.qxa1b.mongodb.net",
+                  "EPCC_ENV": "staging",
+                  "CLUSTER_HOST": "https://D240EDA64D2EF78F46B36298BCE3B219.gr7.eu-west-1.eks.amazonaws.com",
+                  "API_TOKEN": "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJla3MtYWRtaW4tdG9rZW4tcWpydHoiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZWtzLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNDc1NDA0YTQtYjU5NS0xMWVhLTkzZmItMDYwNWEyMzU3Mjk0Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmVrcy1hZG1pbiJ9.JaxHfSbzWcs0ApD3PDjq5ajU_vGy7lFhq8aGoyftsCYOjlYTGh1Nc7a8xAcIzo94gIgiVsAQ_pqy7LN5F6NZoZbQCzoXgLpoyX6mbKlBveBHtk1jwJLU63BKJq74-6mhrFl6RbGxnW_6MpZ1JAqqfOV2h4OXqHqERY-bg8uOOT6zot_hRl_GMhzj612vgI8QiUIYpx4mq7ibeqhyqIQAhrrZFM7G4eeV6gtrXmrYjVaRN4ZpgcqJXYZwYPFaQqlm-HiF52MRD1e5syNW10qN3pBEwZwXuKFplTaf6PjT90VlV-Pj0DdEbxTSI-eb5V8GkH60USTL24e_T9UewtflkQ"
+                }
+              }
+            },
+            "DependsOn": [
+              "StagingDashgetimagesLogGroup"
+            ]
+          },
+          "StagingDashgetimagesLambdaVersionogJE85NllkDYK9pBl2hB4jvMTcZHpiVGb067ydDg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "StagingDashgetimagesLambdaFunction"
+              },
+              "CodeSha256": "aKZx1gCrJtmlw21Vp6GJO8Ea2hq3zWFY78iMLt6Uegw="
+            }
+          },
+          "IntegrationsDashgetimagesLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/versions-cluster-info/staging/1600106191180-2020-09-14T17:56:31.180Z/versions-cluster-info.zip"
+              },
+              "FunctionName": "versions-cluster-info-staging-integrations-getimages",
+              "Handler": "get-images-post-db.main",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "python3.8",
+              "Timeout": 10,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "versions-cluster-info-staging",
+                  "MONGO_DB_USER": "versions",
+                  "MONGO_DB_PASS": "TP8jfyb217sKhyZa",
+                  "MONGO_DB_NAME": "versions",
+                  "MONGO_DB_URL": "devtest.qxa1b.mongodb.net",
+                  "EPCC_ENV": "staging",
+                  "CLUSTER_HOST": "https://D240EDA64D2EF78F46B36298BCE3B219.gr7.eu-west-1.eks.amazonaws.com",
+                  "API_TOKEN": "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJla3MtYWRtaW4tdG9rZW4tcWpydHoiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZWtzLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNDc1NDA0YTQtYjU5NS0xMWVhLTkzZmItMDYwNWEyMzU3Mjk0Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmVrcy1hZG1pbiJ9.JaxHfSbzWcs0ApD3PDjq5ajU_vGy7lFhq8aGoyftsCYOjlYTGh1Nc7a8xAcIzo94gIgiVsAQ_pqy7LN5F6NZoZbQCzoXgLpoyX6mbKlBveBHtk1jwJLU63BKJq74-6mhrFl6RbGxnW_6MpZ1JAqqfOV2h4OXqHqERY-bg8uOOT6zot_hRl_GMhzj612vgI8QiUIYpx4mq7ibeqhyqIQAhrrZFM7G4eeV6gtrXmrYjVaRN4ZpgcqJXYZwYPFaQqlm-HiF52MRD1e5syNW10qN3pBEwZwXuKFplTaf6PjT90VlV-Pj0DdEbxTSI-eb5V8GkH60USTL24e_T9UewtflkQ"
+                }
+              }
+            },
+            "DependsOn": [
+              "IntegrationsDashgetimagesLogGroup"
+            ]
+          },
+          "IntegrationsDashgetimagesLambdaVersioneJsxia0cSG93vdzwFLdpY7qJQ1RabkvqWqAVFi5Fs": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "IntegrationsDashgetimagesLambdaFunction"
+              },
+              "CodeSha256": "aKZx1gCrJtmlw21Vp6GJO8Ea2hq3zWFY78iMLt6Uegw="
+            }
+          },
+          "StagingDashgetimagesEventsRuleSchedule1": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+              "ScheduleExpression": "rate(15 minutes)",
+              "State": "ENABLED",
+              "Targets": [
+                {
+                  "Arn": {
+                    "Fn::GetAtt": [
+                      "StagingDashgetimagesLambdaFunction",
+                      "Arn"
+                    ]
+                  },
+                  "Id": "staging-getimagesSchedule"
+                }
+              ]
+            }
+          },
+          "StagingDashgetimagesLambdaPermissionEventsRuleSchedule1": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "StagingDashgetimagesLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "events.amazonaws.com",
+              "SourceArn": {
+                "Fn::GetAtt": [
+                  "StagingDashgetimagesEventsRuleSchedule1",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          "IntegrationsDashgetimagesEventsRuleSchedule1": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+              "ScheduleExpression": "rate(15 minutes)",
+              "State": "ENABLED",
+              "Targets": [
+                {
+                  "Arn": {
+                    "Fn::GetAtt": [
+                      "IntegrationsDashgetimagesLambdaFunction",
+                      "Arn"
+                    ]
+                  },
+                  "Id": "integrations-getimagesSchedule"
+                }
+              ]
+            }
+          },
+          "IntegrationsDashgetimagesLambdaPermissionEventsRuleSchedule1": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "IntegrationsDashgetimagesLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "events.amazonaws.com",
+              "SourceArn": {
+                "Fn::GetAtt": [
+                  "IntegrationsDashgetimagesEventsRuleSchedule1",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          "TodosDynamoDbTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+              },
+              "TableName": "versions-cluster-info-staging"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          },
+          "StagingDashgetimagesLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "StagingDashgetimagesLambdaVersionogJE85NllkDYK9pBl2hB4jvMTcZHpiVGb067ydDg"
+            }
+          },
+          "IntegrationsDashgetimagesLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "IntegrationsDashgetimagesLambdaVersioneJsxia0cSG93vdzwFLdpY7qJQ1RabkvqWqAVFi5Fs"
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "plugins": [
+      "serverless-python-requirements"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "staging-getimages": {
+        "timeout": 10,
+        "handler": "get-images-post-db.main",
+        "events": [
+          {
+            "schedule": "rate(15 minutes)"
+          }
+        ],
+        "environment": {
+          "MONGO_DB_USER": "versions",
+          "MONGO_DB_PASS": "TP8jfyb217sKhyZa",
+          "MONGO_DB_NAME": "versions",
+          "MONGO_DB_URL": "devtest.qxa1b.mongodb.net",
+          "EPCC_ENV": "staging",
+          "CLUSTER_HOST": "https://D240EDA64D2EF78F46B36298BCE3B219.gr7.eu-west-1.eks.amazonaws.com",
+          "API_TOKEN": "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJla3MtYWRtaW4tdG9rZW4tcWpydHoiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZWtzLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNDc1NDA0YTQtYjU5NS0xMWVhLTkzZmItMDYwNWEyMzU3Mjk0Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmVrcy1hZG1pbiJ9.JaxHfSbzWcs0ApD3PDjq5ajU_vGy7lFhq8aGoyftsCYOjlYTGh1Nc7a8xAcIzo94gIgiVsAQ_pqy7LN5F6NZoZbQCzoXgLpoyX6mbKlBveBHtk1jwJLU63BKJq74-6mhrFl6RbGxnW_6MpZ1JAqqfOV2h4OXqHqERY-bg8uOOT6zot_hRl_GMhzj612vgI8QiUIYpx4mq7ibeqhyqIQAhrrZFM7G4eeV6gtrXmrYjVaRN4ZpgcqJXYZwYPFaQqlm-HiF52MRD1e5syNW10qN3pBEwZwXuKFplTaf6PjT90VlV-Pj0DdEbxTSI-eb5V8GkH60USTL24e_T9UewtflkQ"
+        },
+        "name": "versions-cluster-info-staging-staging-getimages",
+        "package": {},
+        "memory": 1024,
+        "runtime": "python3.8",
+        "vpc": {},
+        "versionLogicalId": "StagingDashgetimagesLambdaVersionogJE85NllkDYK9pBl2hB4jvMTcZHpiVGb067ydDg"
+      },
+      "integrations-getimages": {
+        "timeout": 10,
+        "handler": "get-images-post-db.main",
+        "events": [
+          {
+            "schedule": "rate(15 minutes)"
+          }
+        ],
+        "environment": {
+          "MONGO_DB_USER": "versions",
+          "MONGO_DB_PASS": "TP8jfyb217sKhyZa",
+          "MONGO_DB_NAME": "versions",
+          "MONGO_DB_URL": "devtest.qxa1b.mongodb.net",
+          "EPCC_ENV": "staging",
+          "CLUSTER_HOST": "https://D240EDA64D2EF78F46B36298BCE3B219.gr7.eu-west-1.eks.amazonaws.com",
+          "API_TOKEN": "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJla3MtYWRtaW4tdG9rZW4tcWpydHoiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZWtzLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNDc1NDA0YTQtYjU5NS0xMWVhLTkzZmItMDYwNWEyMzU3Mjk0Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmVrcy1hZG1pbiJ9.JaxHfSbzWcs0ApD3PDjq5ajU_vGy7lFhq8aGoyftsCYOjlYTGh1Nc7a8xAcIzo94gIgiVsAQ_pqy7LN5F6NZoZbQCzoXgLpoyX6mbKlBveBHtk1jwJLU63BKJq74-6mhrFl6RbGxnW_6MpZ1JAqqfOV2h4OXqHqERY-bg8uOOT6zot_hRl_GMhzj612vgI8QiUIYpx4mq7ibeqhyqIQAhrrZFM7G4eeV6gtrXmrYjVaRN4ZpgcqJXYZwYPFaQqlm-HiF52MRD1e5syNW10qN3pBEwZwXuKFplTaf6PjT90VlV-Pj0DdEbxTSI-eb5V8GkH60USTL24e_T9UewtflkQ"
+        },
+        "name": "versions-cluster-info-staging-integrations-getimages",
+        "package": {},
+        "memory": 1024,
+        "runtime": "python3.8",
+        "vpc": {},
+        "versionLogicalId": "IntegrationsDashgetimagesLambdaVersioneJsxia0cSG93vdzwFLdpY7qJQ1RabkvqWqAVFi5Fs"
+      }
+    },
+    "resources": {
+      "Resources": {
+        "TodosDynamoDbTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+              }
+            ],
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
+            },
+            "TableName": "versions-cluster-info-staging"
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "layers": {},
+    "initialServerlessConfig": {
+      "service": "versions-cluster-info",
+      "frameworkVersion": ">=1.8.2 <2.0.0",
+      "plugins": {
+        "$ref": "$[\"service\"][\"plugins\"]"
+      },
+      "package": {
+        "exclude": [
+          "node_modules/**",
+          ".idea/**",
+          ".requirements/**",
+          "env/**",
+          "README.md",
+          "package.json",
+          "package-lock.json",
+          "requirements.txt"
+        ],
+        "artifact": "/Users/jfowler/src/versions-dashboard/cluster-info/.serverless/versions-cluster-info.zip",
+        "artifactDirectoryName": "serverless/versions-cluster-info/staging/1600106191180-2020-09-14T17:56:31.180Z"
+      },
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.8",
+        "iamManagedPolicies": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "region": "us-west-2",
+        "stage": "staging",
+        "environment": {
+          "DYNAMODB_TABLE": "versions-cluster-info-staging"
+        },
+        "iamRoleStatements": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:Query",
+              "dynamodb:Scan",
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:DeleteItem"
+            ],
+            "Resource": "arn:aws:dynamodb:us-west-2:*:table/versions-cluster-info-staging"
+          }
+        ]
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      }
+    },
+    "isDashboardMonitoringPreconfigured": false,
+    "artifact": "/Users/jfowler/src/versions-dashboard/cluster-info/.serverless/versions-cluster-info.zip"
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/versions-cluster-info/staging/1600106191180-2020-09-14T17:56:31.180Z",
+    "artifact": "versions-cluster-info.zip"
+  }
+}

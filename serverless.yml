@@ -1,0 +1,70 @@
+service: versions-cluster-info
+
+frameworkVersion: ">=1.8.2 <2.0.0"
+
+plugins:
+  - serverless-python-requirements
+
+package:
+  exclude:
+    - node_modules/**
+    - .idea/**
+    - .requirements/**
+    - env/**
+    - README.md
+    - package.json
+    - package-lock.json
+    - requirements.txt
+
+provider:
+  name: aws
+  runtime: python3.8
+  iamManagedPolicies:
+    - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  region: ${opt:region, 'us-west-2'}
+  stage: ${opt:stage, 'staging'}
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  staging-getimages:
+    timeout: 10
+    handler: get-images-post-db.main
+    events:
+      - schedule: rate(15 minutes)
+    environment: ${file(env.yml):${self:provider.stage}}
+  integrations-getimages:
+    timeout: 10
+    handler: get-images-post-db.main
+    events:
+      - schedule: rate(15 minutes)
+    environment: ${file(env.yml):${self:provider.stage}}
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
