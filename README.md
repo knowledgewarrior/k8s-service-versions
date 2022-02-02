@@ -25,10 +25,9 @@ Cron Task for each K8S cluster from which to obtain a list of images.
 
 ## Serverless Deploy
 
-A `serverless-versiondash` IAM user was created in AWS account `648265802301`
-(Elastic Path DevOps)
+A `serverless-versiondash` IAM user is required in the target AWS account.
 
-Obtain AWS Key and Secret from Ops `1Password` and add to a profile in `~/.aws/credentials`:
+Add the access key and secret to a profile in `~/.aws/credentials`:
 ```
 [sls-versiondash]
 aws_access_key_id = AKIAxxxxxxxx
@@ -38,9 +37,9 @@ region = us-west-2
 
 Run command to deploy:
 ```
-sls deploy --aws-profile sls-versiondash --stage <epcc-environment>
+sls deploy --aws-profile sls-versiondash --stage <environment>
 ```
-where `<epcc-environment>` in:
+where `<environment>` in:
 - staging
 - integrations
 - production
@@ -63,7 +62,7 @@ python3 -m pip install -r requirements.txt
 Copy the file `.env.example` to `.env` and modify variables according to the
 target cluster:
 ```
-epcc-env = '' # environment where apps are running
+env = '' # environment where apps are running
 api-token = '' # api token, preferably based on `EKS_Restricted` AWS role
 cluster_host = '' # host in .kube/config to connect to for K8S API
 ```
