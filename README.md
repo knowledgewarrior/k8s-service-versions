@@ -6,10 +6,10 @@ We currently have no way of knowing the version of a micro service running on ou
 Query the Kubernetes API for all micro services running in the cluster and create a document database entry in DymnamoDB for querying from a frontend such as a dashboard.
 
 ## Assumptions:
-We have access to the Kubernetes API
-The number of micro services is not fixed.  Today we have 28 services, but this could change.
-We want raw data in the DynamoDB table from which to query in the frontend.
-We will build the front end separate from the backend querying code.
+- We have access to the Kubernetes API
+- The number of micro services is not fixed.  Today we have 28 services, but this could change.
+- We want raw data in the DynamoDB table from which to query in the frontend.
+- We will build the front end separate from the backend querying code.
 
 ## Implementation:
 I wrote code in Python and in ServerLess to be deployed to AWS Lambda.  The code creates the Lambda, the DynamoDB table, and runs the Python code as a cron job from Lambda to query the Kubernetes API in AWS EKS.  The results returned from the API are posted to DynamoDB:  
