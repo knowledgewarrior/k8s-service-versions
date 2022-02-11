@@ -1,5 +1,5 @@
 # Version Dashboard Cluster Info
-# Jason Fowler, Elastic Path 2020
+# Jason Fowler, 2020
 
 # The goal is to obtain a list of images from a remote cluster
 # using an API key and hostname
